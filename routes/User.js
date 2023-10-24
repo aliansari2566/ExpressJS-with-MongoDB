@@ -1,6 +1,7 @@
 const express = require("express")
 const userModel = require("../Model/userModel")
 const router = express.Router()
+const mongoose = require("mongoose");
 
 // localhost:3000/api/home
 
@@ -34,7 +35,32 @@ router.get("/All", async (req, res) => {
       res.status(500).json({ error: "An error occurred." });
     }
   });
+
+ 
+ // Getting  user by id data from database
+  router.get("/user/:id", async (req, res) => {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({ error: "Invalid user ID format" });
+      }
   
+      const user = await userModel.findById(req.params.id);
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found, invalid ID" });
+      }
+  
+      res.status(200).json(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
+  });
+
+
+
+
+
 
 // req.body represents the data sent in the request's body. In a POST request, clients often send data in the request body, and req.body allows you to access that data on the server
 
@@ -62,6 +88,27 @@ router.post("/add", async (req, res) => {
       res.status(500).send(err);
     }
   });
+
+
+// Delete Route
+router.delete("/user/:id", async (req, res) => {
+    try {
+      const deletedUser = await userModel.findByIdAndDelete(req.params.id);
+  
+      if (!deletedHero) {
+        return res.status(404).json({ error: "User not found, invalid ID" });
+      }
+  
+      res.status(200).json({ msg: "Hero Removed", User: deletedUser });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }    
+  });
+
+
+
+
 // if we are creating any thing in seprate file then we have to export it so that it can be accessible outside that file
 
 module.exports = router 
