@@ -91,22 +91,43 @@ router.post("/add", async (req, res) => {
 
 
 // Delete Route
-router.delete("/user/:id", async (req, res) => {
-    try {
-      const deletedUser = await userModel.findByIdAndDelete(req.params.id);
+// Uses the findByIdAndDelete method provided by Mongoose, which is a convenient way to find and delete a document by its ID.
+// Returns the deleted user as part of the response.
+
+// router.delete("/user/:id", async (req, res) => {
+//     try {
+//       const deletedUser = await userModel.findByIdAndDelete(req.params.id);
   
-      if (!deletedHero) {
+//       if (!deletedUser) {
+//         return res.status(404).json({ error: "User not found, invalid ID" });
+//       }
+  
+//       res.status(200).json({ msg: "User Removed", User: deletedUser });
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ error: "Internal Server Error" });
+//     }    
+//   });
+
+
+//   Uses the deleteOne method, which allows you to specify deletion criteria. In this case, it deletes a document based on its ID.
+//   Returns information about the deletion, including the number of documents deleted.  
+router.delete("/user/:id", async (req, res) => {
+    const id = req.params.id;
+  
+    try {
+      const deletedUser = await userModel.deleteOne({ _id: id });
+  
+      if (deletedUser.deletedCount === 0) {
         return res.status(404).json({ error: "User not found, invalid ID" });
       }
   
-      res.status(200).json({ msg: "Hero Removed", User: deletedUser });
+      res.status(200).json({ msg: "User Removed", User: deletedUser });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
-    }    
+    }
   });
-
-
 
 
 // if we are creating any thing in seprate file then we have to export it so that it can be accessible outside that file
