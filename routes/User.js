@@ -1,6 +1,7 @@
 const express = require("express");
 const userModel = require("../Model/userModel");
 const router = express.Router();
+
 const mongoose = require("mongoose");
 
 // localhost:3000/api/home
@@ -118,6 +119,56 @@ router.delete("/user/:id", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+// Put route
+router.put("/user/:id", async (req, res) => {
+
+  
+    const user = await userModel.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found, invalid ID" });
+    }
+    try {
+      const updatedUser = await userModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password
+        },
+        { new: true } // Return the updated document
+      );
+  
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found, invalid ID" });
+      }
+  
+      res.status(200).json({ msg: "User is updated", user: updatedUser });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
+// Patch Route
+// router.patch("/user/:id", async (req, res) => {
+//     const id = req.params.id;
+  
+//     try {
+//       const update = await userModel.updateOne({ _id: id }, { $set: req.body });
+  
+//       if (update.nModified === 0) {
+//         return res.status(404).json({ error: "User not found, invalid ID" });
+//       }
+  
+//       res.status(200).json({ msg: "User updated successfully" });
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ error: "Internal Server Error" });
+//     }
+//   });
 
 // if we are creating any thing in seprate file then we have to export it so that it can be accessible outside that file
 
