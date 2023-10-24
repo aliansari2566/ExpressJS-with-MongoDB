@@ -23,10 +23,12 @@ res.json({
 
 })
 
+// Gettin all data from database
 router.get("/All", async (req, res) => {
     try {
+        // find() is  a mongoose method which gives all the data from data base
       const AllUsers = await userModel.find({});
-      res.status(200).send(AllUsers);
+      res.status(200).send(AllUsers); 
     } catch (error) {
       console.error("An error occurred.", error);
       res.status(500).json({ error: "An error occurred." });
