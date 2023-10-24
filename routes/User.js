@@ -122,6 +122,9 @@ router.delete("/user/:id", async (req, res) => {
 
 
 // Put route
+// Full Replacement: PUT is used for full updates or replacements of a resource.
+// When you send a PUT request, you should provide a complete representation of the resource. The existing resource is replaced with the new representation.
+
 router.put("/user/:id", async (req, res) => {
 
   
@@ -153,22 +156,24 @@ router.put("/user/:id", async (req, res) => {
   });
 
 // Patch Route
-// router.patch("/user/:id", async (req, res) => {
-//     const id = req.params.id;
+// Partial Update: PATCH is used for making partial updates to a resource.
+// It means that you can send only the specific fields that need to be updated without modifying the entire resource.
+router.patch("/user/:id", async (req, res) => {
+    const id = req.params.id;
   
-//     try {
-//       const update = await userModel.updateOne({ _id: id }, { $set: req.body });
+    try {
+      const update = await userModel.updateOne({ _id: id }, { $set: req.body });
   
-//       if (update.nModified === 0) {
-//         return res.status(404).json({ error: "User not found, invalid ID" });
-//       }
+      if (update.nModified === 0) {
+        return res.status(404).json({ error: "User not found, invalid ID" });
+      }
   
-//       res.status(200).json({ msg: "User updated successfully" });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ error: "Internal Server Error" });
-//     }
-//   });
+      res.status(200).json({ msg: "User updated successfully" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
 
 // if we are creating any thing in seprate file then we have to export it so that it can be accessible outside that file
 
