@@ -1,10 +1,13 @@
 const express = require("express");
 const userModel = require("../Model/userModel");
 const router = express.Router();
-
+const Joi = require ("@hapi/joi")
+const brycpt = require("bcrypt")
 const mongoose = require("mongoose");
 
 // localhost:3000/api/home
+// 1. generate a salt -> it creates a random text to make your password more secure
+// 2. hash a password -> hash(1223121, salt)
 
 router.get("/home", (req, res) => {
   // it will visible on console
@@ -65,22 +68,82 @@ router.get("/user/:id", async (req, res) => {
 // })
 
 // In the second code block, a userModel instance is created by explicitly specifying the properties to include, and each property is extracted from the req.body object. This code block gives you more control over which properties from the request body you want to include in the new user object.
+
+// Simple api
+// router.post("/add", async (req, res) => {
+
+
+//   try {
+//     console.log("Request Body:", req.body); // Log the request body
+
+//     const user = new userModel({
+//       name: req.body.name,
+//       email: req.body.email,
+//       password: req.body.password,
+//     });
+
+//     const resp = await user.save();
+//     res.send(resp);
+//   } catch (err) {
+//     res.status(500).send(err);
+//   }
+// });
+
+// Validated POST API
+
 router.post("/add", async (req, res) => {
-  try {
-    console.log("Request Body:", req.body); // Log the request body
-
-    const user = new userModel({
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
+    // Define the validation schema using Joi
+    const schema = Joi.object({
+      name: Joi.string().min(5).required(),
+      email: Joi.string().email().required(),
+      password: Joi.string().min(6).required(),
     });
+  
+    // Validate the request body against the schema
+    const { error, value } = schema.validate(req.body);
+  
+    if (error) {
+      // If validation fails, send a 400 Bad Request response with error details
+      return res.status(400).json({ error: error.details[0].message });
+    }
+  
+    try {
+      console.log("Request Body:", value); // Log the validated request body
+  
+      // Check if a user with the same name or email already exists
+      const existingUser = await userModel.findOne({
+        $or: [
+          { name: value.name },
+          { email: value.email },
+        ],
+      });
+      // console.log(value.password);
+  
+      const salt = await brycpt.genSalt(10)
+      const hashPassword = await brycpt.hash(value.password, salt)
 
-    const resp = await user.save();
-    res.send(resp);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
+      // console.log(hashPassword);
+
+      if (existingUser) {
+        // If a user with the same name or email exists, send an error response
+        return res.status(400).json({ error: "User with the same name or email already exists." });
+      }
+  
+      // If no existing user is found, proceed to create and save the new user
+      const user = new userModel({
+        name: value.name,
+        email: value.email,
+        password: hashPassword ,
+      });
+  
+      const resp = await user.save();
+      res.send(resp);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  });
+  
+
 
 // Delete Route
 // Uses the findByIdAndDelete method provided by Mongoose, which is a convenient way to find and delete a document by its ID.
