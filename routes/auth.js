@@ -10,7 +10,8 @@ router.post("/login" , async(req,res)=>{
     if(!user) return res.send("invalid email..")
 
     const passVerification = await brycpt.compare(req.body.password, user.password)
-    res.send(passVerification);
+    if(!passVerification) return     res.send("Invalid Password");
+
 
 })
 
