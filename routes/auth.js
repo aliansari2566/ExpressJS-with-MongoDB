@@ -13,7 +13,14 @@ router.post("/login" , async(req,res)=>{
     if(!passVerification) return     res.send("Invalid Password");
 
 
-    const token = jwt.sign({_id:user._id}, process.env.We )
+    const token = jwt.sign({_id:user._id}, process.env.Web_token)
+    res.send({
+        body:{
+            user:user,
+            token:token
+        }
+    })
+
 
 })
 
