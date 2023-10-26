@@ -2,7 +2,7 @@ const express = require("express");
 const userModel = require("../Model/userModel")
 const brycpt = require("bcrypt")
 const router = express.Router()
-
+const jwt = require("jsonwebtoken")
 
 router.post("/login" , async(req,res)=>{ 
 
@@ -12,6 +12,8 @@ router.post("/login" , async(req,res)=>{
     const passVerification = await brycpt.compare(req.body.password, user.password)
     if(!passVerification) return     res.send("Invalid Password");
 
+
+    const token = jwt.sign({_id:user._id}, process.env.We )
 
 })
 
