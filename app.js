@@ -2,6 +2,7 @@ const express = require("express")
 require("dotenv").config();
 const app = express();
 const userRoutes = require("./routes/User")
+const authRoutes = require("./routes/auth")
 
 const connectDB = require("./db");
 
@@ -13,6 +14,8 @@ connectDB();
 app.use(express.json())
 // Using /api/ as a prefix or a route segment when using app.use('/api/', userRoutes) in your Express application is a common practice 
 app.use('/api/users/',userRoutes)
+app.use('/api/auth/',authRoutes)
+
 
 
 
@@ -25,3 +28,4 @@ const server = app.listen(process.env.PORT , () =>{
 
     console.log(`Server started on port ${process.env.PORT}`)
 }) 
+

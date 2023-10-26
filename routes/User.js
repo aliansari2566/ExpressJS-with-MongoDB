@@ -1,13 +1,22 @@
 const express = require("express");
-const userModel = require("../Model/userModel");
-const router = express.Router();
+const userModel = require("../Model/userModel")
+const router = express.Router()
+
 const Joi = require ("@hapi/joi")
 const brycpt = require("bcrypt")
-const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken")
+const verifyToken = require("./verifyJWT")
+const mongoose = require("mongoose")
 
 // localhost:3000/api/home
 // 1. generate a salt -> it creates a random text to make your password more secure
 // 2. hash a password -> hash(1223121, salt)
+
+router.get('/token',(req , res)=>{
+const token = jwt.sign({_id:123123}, process.env.Web_token)
+res.send(token)
+
+})
 
 router.get("/home", (req, res) => {
   // it will visible on console
@@ -26,7 +35,7 @@ router.get("/home", (req, res) => {
 });
 
 // Gettin all data from database
-router.get("/All", async (req, res) => {
+router.get("/All", verifyToken, async (req, res) => {
   try {
     // find() is  a mongoose method which gives all the data from data base
     const AllUsers = await userModel.find({});
